@@ -26,6 +26,6 @@ A weather-aware cooking tips widget built on Scriptable that delivers contextual
 2. **API Layer**: Built Google Apps Script endpoint that maps weather conditions to appropriate flavor categories and filters by region
 3. **Widget Layer**: Developed Scriptable widget that fetches location, calls weather API, queries cooking database, selects randon image and caches results locally
 4. **Automation**: Configured daily refresh logic that only fetches new data after 8AM, using cache for all other interactions
-
+![User Flow](docs/images/Flow-Overview.png)
 ## Results
 The widget became part of my daily routine - I check it every morning. 4 friends adopted it after seeing it work, each customizing their regional preferences
