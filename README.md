@@ -24,7 +24,7 @@ A weather-aware cooking tips widget built on Scriptable that delivers contextual
 
 ## Implementation
 
-1. **Data Layer**: Used Jupyter Notebooks to call Claude API in batches for generating cooking tips across different regions and flavor profiles, then merged and exported to CSV file which was brought to Sheets for cooking tip database
+1. **Data Layer**: Used Jupyter Notebooks to call OpenAI in batches for generating cooking tips across different regions and flavor profiles, then merged and exported to CSV file which was brought to Sheets for cooking tip database
 2. **API Layer**: Built Google Apps Script endpoint that maps weather conditions to appropriate flavor categories and filters by region
 3. **Widget Layer**: Developed Scriptable widget that fetches location, calls weather API, queries cooking database, selects randon image and caches results locally
 4. **Automation**: Configured daily refresh logic that only fetches new data after 8AM, using cache for all other interactions
