@@ -71,7 +71,7 @@ async function fetchWeatherTip() {
 
   return {
     tip: tipResponse.tip,
-    region: tipResponse.region, // ← Thêm dòng này
+    region: tipResponse.region, 
     updatedAt: new Date().toISOString(),
     weather: { main: mainWeather, description, temp: temperature }
   };
@@ -150,7 +150,7 @@ async function run() {
     const cache = loadCache();
     const now = new Date();
 
-    // Chỉ refresh nếu: chưa có data hoặc chưa update hôm nay sau giờ bạn set up
+    // Refresh if there is no cache
     const refreshtime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 0);
     const lastUpdate = cache ? new Date(cache.updatedAt) : new Date(0);
     
@@ -169,7 +169,7 @@ async function run() {
     }
   }
   else {
-    // Manual run trong app - luôn fetch để test
+    // Manual run in app, always fetch
     const data = await fetchWeatherTip();
     saveCache(data);
     QuickLook.present("Manual refresh: " + new Date().toLocaleTimeString());
