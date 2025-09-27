@@ -1,0 +1,177 @@
+// Mapping function for OpenWeatherMap conditions
+function mapOpenWeatherToCondition(mainWeather) {
+  const conditionMap = {
+    "Thunderstorm": "Rain",
+    "Drizzle": "Drizzle",
+    "Rain": "Rain",
+    "Snow": "Cold",
+    "Mist": "Cloudy",
+    "Smoke": "Cloudy",
+    "Haze": "Cloudy",
+    "Dust": "Cloudy",
+    "Fog": "Cloudy",
+    "Sand": "Cloudy",
+    "Ash": "Cloudy",
+    "Squall": "Rain",
+    "Tornado": "Rain",
+    "Clear": "Clear",
+    "Clouds": "Cloudy"
+  };
+
+  return conditionMap[mainWeather] || "Clear";
+}
+
+// Main function to get tip by weather
+function getTipByWeather(weather, regions) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const data = sheet.getDataRange().getValues();
+  const validRows = [];
+  
+  // Parse regions if provided
+  const allowedRegions = regions ? regions.split(',') : null;
+  
+  const weatherFlavorMap = {
+    "Rain": ["Spicy/Heat", "Savory/Complex", "Aromatic", "Earthy/Balanced"],
+    "Hot": ["Light/Fresh", "Cooling", "Fresh/Herby", "Tangy/Bright"],
+    "Clear": ["Grilled", "Balanced/Subtle", "Crunchy/Fresh", "Smoky"],
+    "Drizzle": ["Warm/Comfort", "Savory/Complex", "Umami", "Earthy/Balanced"],
+    "Cloudy": ["Aromatic", "Balanced/Subtle", "Umami"],
+    "Cold": ["Savory/Complex", "Smoky", "Earthy/Balanced"]
+  };
+
+  const flavors = weatherFlavorMap[weather] || [];
+
+  for (let i = 1; i < data.length; i++) {
+    const row = data[i];
+    const flavor = row[5];
+    const tip = row[6];
+    const region = row[1];
+    
+    if (!flavors.includes(flavor)) continue;
+    if (allowedRegions && !allowedRegions.includes(region)) continue;
+    
+    validRows.push({ tip: tip, region: region });
+  }
+
+  if (validRows.length > 0) {
+    const randomIndex = Math.floor(Math.random() * validRows.length);
+    return validRows[randomIndex];
+  } else {
+    return { tip: "Không có tip phù hợp cho thời tiết " + weather, region: "Unknown" };
+  }
+}
+
+// Web app endpoint to handle requests
+function doGet(e) {
+  const originalWeather = e.parameter.weather;
+  const description = e.parameter.description || '';
+  const temperature = parseFloat(e.parameter.temp) || 0;
+  const regions = e.parameter.regions; // ← Add regions parameter
+  
+  const mappedWeather = mapOpenWeatherToCondition(originalWeather);
+  const result = getTipByWeather(mappedWeather, regions); // ← Pass regions
+  
+  return ContentService.createTextOutput(JSON.stringify({
+    originalWeather: originalWeather,
+    mappedWeather: mappedWeather,
+    description: description,
+    temperature: temperature,
+    tip: result.tip,
+    region: result.region
+  })).setMimeType(ContentService.MimeType.JSON);
+}
+
+// Test function to simulate different weather conditions
+function testGetTipByWeather() {
+  const testCases = [
+    { weather: "Rain", description: "Light rain", temp: 25 },
+    { weather: "Clear", description: "Sunny day", temp: 30 },
+    { weather: "Cloudy", description: "Overcast", temp: 22 },
+    { weather: "Cold", description: "Chilly", temp: 15 }
+  ];
+  
+  const weatherFlavorMap = {
+    "Rain": ["Spicy/Heat", "Savory/Complex", "Aromatic", "Earthy/Balanced"],
+    "Hot": ["Light/Fresh", "Cooling", "Fresh/Herby", "Tangy/Bright"],
+    "Clear": ["Grilled", "Balanced/Subtle", "Crunchy/Fresh", "Smoky"],
+    "Drizzle": ["Warm/Comfort", "Savory/Complex", "Umami", "Earthy/Balanced"],
+    "Cloudy": ["Aromatic", "Balanced/Subtle", "Umami"],
+    "Cold": ["Savory/Complex", "Smoky", "Earthy/Balanced"]
+  };
+  
+  testCases.forEach(testCase => {
+    const result = doGet({parameter: testCase});
+    const parsedResult = JSON.parse(result.getContent());
+    
+    Logger.log("Input Weather: " + testCase.weather);
+    Logger.log("Mapped Weather: " + parsedResult.mappedWeather);
+    Logger.log("Mapped Flavors: " + JSON.stringify(weatherFlavorMap[parsedResult.mappedWeather]));
+    Logger.log("Tip: " + parsedResult.tip);
+    Logger.log("---");
+  });
+}
+
+// Test function to simulate OpenWeatherMap responses
+function testWithOpenWeatherMapSimulation() {
+  const testCases = [
+    {
+      weather: [{ main: "Rain", description: "light rain" }],
+      main: { temp: 22 },
+      name: "Test City 1"
+    },
+    {
+      weather: [{ main: "Clear", description: "clear sky" }],
+      main: { temp: 30 },
+      name: "Test City 2"
+    },
+    {
+      weather: [{ main: "Clouds", description: "scattered clouds" }],
+      main: { temp: 25 },
+      name: "Test City 3"
+    },
+    {
+      weather: [{ main: "Snow", description: "light snow" }],
+      main: { temp: 5 },
+      name: "Test City 4"
+    }
+  ];
+  
+  const weatherFlavorMap = {
+    "Rain": ["Spicy/Heat", "Savory/Complex", "Aromatic", "Earthy/Balanced"],
+    "Hot": ["Light/Fresh", "Cooling", "Fresh/Herby", "Tangy/Bright"],
+    "Clear": ["Grilled", "Balanced/Subtle", "Crunchy/Fresh", "Smoky"],
+    "Drizzle": ["Warm/Comfort", "Savory/Complex", "Umami", "Earthy/Balanced"],
+    "Cloudy": ["Aromatic", "Balanced/Subtle", "Umami"],
+    "Cold": ["Savory/Complex", "Smoky", "Earthy/Balanced"]
+  };
+  
+  testCases.forEach(mockResponse => {
+    // Extract key data
+    const mainWeather = mockResponse.weather[0].main;
+    const description = mockResponse.weather[0].description;
+    const temperature = mockResponse.main.temp;
+    
+    // Simulate doGet with these parameters
+    const mockRequest = {
+      parameter: {
+        weather: mainWeather,
+        description: description,
+        temp: temperature
+      }
+    };
+    
+    // Call doGet with simulated data
+    const result = doGet(mockRequest);
+    const parsedResult = JSON.parse(result.getContent());
+    
+    // Log detailed results
+    Logger.log("==== Test Case ====");
+    Logger.log("Original Weather: " + mainWeather);
+    Logger.log("Description: " + description);
+    Logger.log("Temperature: " + temperature + "°C");
+    Logger.log("Mapped Weather: " + parsedResult.mappedWeather);
+    Logger.log("Mapped Flavors: " + JSON.stringify(weatherFlavorMap[parsedResult.mappedWeather]));
+    Logger.log("Tip: " + parsedResult.tip);
+    Logger.log("-------------------");
+  });
+}
