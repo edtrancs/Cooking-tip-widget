@@ -1,8 +1,8 @@
 ## Problem Statement
-My mom and I struggled with daily cooking inspiration, often falling into repetitive meal patterns or spending too much mental energy deciding what to cook. We needed a simple way to get fresh cooking ideas without the cognitive overhead of planning or researching recipes.
+My mom and I struggled with daily cooking inspiration, often falling into repetitive meal patterns or spending too much mental energy deciding what to cook. We needed a simple way to get fresh cooking ideas without the cognitive overhead of planning or researching recipes. I set myself 1 week to finish the MVP. 
 
 ## Solution
-A weather-aware cooking tips widget built on Scriptable that delivers contextual culinary inspiration filtered by local weather conditions and regional cuisine preferences. I chose Scriptable over Apple's paid developer program since it's free and perfectly suited for personal widget development need.
+A weather-aware cooking tips widget built with Scriptable, designed to provide contextual culinary inspiration based on both local weather conditions and regional cuisine preferences. The idea stems from how we usually decide what to cook—often influenced by the weather—and further refined by personal taste. For example, my mom prefers only Asian dishes, while some of my friends are more open to diverse cuisines. I chose Scriptable because it’s free and well-suited for personal widget development, making it a practical alternative to Apple’s paid developer program.
 
 ## Features
 
